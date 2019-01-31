@@ -2,7 +2,7 @@
 
 ---
 
-### содержание
+### Содержание
 
 - описание проекта
 - предпосылки для перехода
@@ -11,7 +11,7 @@
 
 ---
 
-### особенности проекта
+### Особенности проекта
 
 @ul[spaced]
 - shop2.0 это проект магазина внутриигрового клиента включающий большое кол-во интеграций с различными сервисами
@@ -24,7 +24,7 @@
 
 ---
 
-### предпосылки для перехода
+### Предпосылки для перехода
 
 - несколько источников данных, которые надо привести к единому виду
 - высокий порог вхождения в проект
@@ -35,11 +35,11 @@
 
 ---
 
-### почему именно `typescript`
+### Почему именно `typescript`
 
 ---
 
-### были рассмотрены технологии:
+### Были рассмотрены технологии:
 
 @ul[spaced]
 - `typescript`
@@ -49,7 +49,7 @@
 
 ---
 
-### преимущества перед конкурентами:
+### Преимущества перед конкурентами:
 
 @ul[spaced]
 - большое комьюнити
@@ -64,7 +64,7 @@
 
 ---
 
-### почему не использовали с начала проекта
+### Почему не использовали с начала проекта
 
 - не было нужных специалистов на этапе старта проекта
 - не было явных бенефитов от использования новой, неизвестной нам технологии
@@ -73,11 +73,92 @@
 
 ---
 
-### процесс миграции
+### Процесс миграции
 
 ---
 
-### порядок миграции
+### Конфигурация
+
+```diff
+// webpack.config.js
+module: {
+    rules: [
+        {
+            oneOf: [
++                {
++                    test: [/\.tsx?$/],
++                    include: [paths.appSrc],
++                    use: [
++                        {
++                            loader: 'ts-loader',
++                            options: { transpileOnly: true },
++                        }
++                    ],
++                },
+                {
+                    test: /\.s?css$/,
+                    use: [
+                        { loader: require.resolve('style-loader') },
++                        {
++                            loader: require.resolve('typings-for-css-modules-loader'),
++                            options: {
++                                modules: true,
++                                camelCase: true,
++                                localIdentName: '[name]_[local]--[hash:base64:5]',
++                                importLoaders: 1,
++                                sourceMap: true,
++                                namedExport: true,
++                            },
++                        },
+                    ],
+                },
+                // another loaders
+            ],
+        },
+    ],
+    // another options
+},
+```
+
++++
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": "./src", // enables absolute path imports
+    "outDir": "dist", // target for compiled files
+    "allowSyntheticDefaultImports": true, // no errors on commonjs default import
+    "esModuleInterop": true,
+    "allowJs": true, // include js files
+    "jsx": "react", // process JSX
+    "lib": ["dom", "es2016", "es2017.object"],
+    "target": "es5", // "es2015" for ES6+ engines
+    "module": "commonjs", // "es2015" for tree-shaking
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "noUnusedLocals": true,
+    "strict": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "typeRoots": [
+      "src/typings",
+      "node_modules/@types"
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+
+```
+---
+
+### Порядок миграции
 
 @ul[spaced]
 - стейт
@@ -90,7 +171,7 @@
 
 ---
 
-### пошаговая миграция модуля
+### Пошаговая миграция модуля
 
 @ul[spaced]
 - переименовать модуль изменив расширение файла
@@ -106,7 +187,7 @@
 
 ---
 
-### проблемы
+### Проблемы
 
 @ul[spaced]
 - `jest` не мог явно зарезолвить смешанные импорты (`.jsx?` \ `.tsx?`)
@@ -123,7 +204,7 @@
 
 ---
 
-### бенефиты
+### Бенефиты
 
 @ul[spaced]
 - код стал более читаемым
@@ -152,19 +233,20 @@
 
 ---
 
-### общие выводы
+### Общие выводы
 
 - typescript не замена юниттестам!
 - юниттесты нужны
 
 ---
 
-### планы на будущее
+### Планы на будущее
 
 - strictNullChecks
 - strictBindCallApply
 - `web2client` на typescript
 - `react-wot-bootstrap` на typescript
+- Использовать `babel-preset-typescript` в `babel 7`
 
 ---
 
